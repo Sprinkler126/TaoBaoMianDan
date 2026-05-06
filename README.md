@@ -21,13 +21,19 @@ pip install flask openpyxl pandas
 
 ### 准备数据
 
-将 Excel 数据文件命名为 `data.xlsx`，放在项目根目录下。
+复制样例数据文件，将其重命名为 `data.xlsx` 后放在项目根目录下：
+
+```bash
+cp data.xlsx.example data.xlsx
+```
 
 **数据格式要求：**
 
 - 每一列的**列头**为人员姓名
 - 列头下方的单元格为金额数字（整数），每人一列
 - 空单元格会被自动忽略
+
+> `data.xlsx` 已在 `.gitignore` 中忽略，请勿提交到仓库。
 
 示例：
 
@@ -48,10 +54,11 @@ python app.py
 ## 项目结构
 
 ```
-├── app.py              # Flask 后端，组合搜索算法
-├── data.xlsx           # 人员金额数据（Excel 格式）
+├── app.py                  # Flask 后端，组合搜索算法
+├── data.xlsx.example       # 数据格式样例（可复制为 data.xlsx 使用）
+├── data.xlsx               # 人员金额数据（已忽略，不入库）
 └── templates/
-    └── index.html      # 前端页面
+    └── index.html          # 前端页面
 ```
 
 ## 算法说明
