@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>凑数计算器</title>
+    <style>
+      :root {
+        --primary: #4f46e5;
+        --primary-light: #6366f1;
+        --bg: #f1f5f9;
+        --card: #ffffff;
+        --border: #e2e8f0;
+        --text: #1e293b;
+        --text-sec: #64748b;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --purple: #7c3aed;
+        --radius: 10px;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1140px;
+        margin: 0 auto;
+      }
+      h1 {
+        text-align: center;
+        font-size: 26px;
+        margin-bottom: 24px;
+        color: var(--primary);
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 20px 24px;
+        margin-bottom: 18px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        border: 1px solid var(--border);
+      }
+      .card-title {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text);
+      }
+      .icon {
+        font-size: 18px;
+      }
+
+      .quick-btns {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .qb {
+        padding: 5px 13px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: #fff;
+        cursor: pointer;
+        font-size: 12px;
+        color: var(--text-sec);
+        transition: 0.15s;
+      }
+      .qb:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: #eef2ff;
+      }
+
+      .ptable {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .ptable th,
+      .ptable td {
+        padding: 9px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      .ptable th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: var(--text-sec);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+      .ptable tr:last-child td {
+        border-bottom: none;
+      }
+      .ptable tr:hover td {
+        background: #fafbfd;
+      }
+      .cb-c {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .cb-c input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        accent-color: var(--primary);
+        cursor: pointer;
+      }
+
+      .nums-wrap {
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+      .nums-wrap.collapsed {
+        max-height: 0 !important;
+      }
+      .nums-flex {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 2px 0;
+      }
+      .nt {
+        background: #eef2ff;
+        color: var(--primary);
+        padding: 2px 9px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .toggle-nums {
+        background: none;
+        border: none;
+        color: var(--primary);
+        cursor: pointer;
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: 0.15s;
+      }
+      .toggle-nums:hover {
+        background: #eef2ff;
+      }
+
+      .target-area {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+      .ig {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+        min-width: 240px;
+      }
+      .ig label {
+        font-size: 12px;
+        color: var(--text-sec);
+        font-weight: 500;
+      }
+      .ig input {
+        padding: 9px 13px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        transition: 0.2s;
+      }
+      .ig input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+      .btn-calc {
+        padding: 9px 28px;
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        white-space: nowrap;
+      }
+      .btn-calc:hover {
+        opacity: 0.9;
+      }
+      .btn-calc:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .btn-system {
+        background: var(--purple);
+      }
+      .btn-system:hover {
+        background: #6d28d9;
+      }
+
+      .target-block {
+        margin-bottom: 24px;
+      }
+      .target-hd {
+        font-size: 16px;
+        font-weight: 700;
+        padding: 10px 16px;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: #fff;
+        border-radius: var(--radius) var(--radius) 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .target-hd.system-hd {
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+      }
+      .target-hd .count-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 2px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+      }
+      .target-bd {
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 var(--radius) var(--radius);
+        padding: 16px;
+        background: #fff;
+      }
+      .no-exact {
+        padding: 10px 14px;
+        background: #fef3c7;
+        border: 1px solid #fde68a;
+        border-radius: 8px;
+        color: #92400e;
+        font-size: 13px;
+        margin-bottom: 14px;
+      }
+      .closest-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--warning);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .sol-card {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px;
+        margin-bottom: 10px;
+      }
+      .sol-card:last-child {
+        margin-bottom: 0;
+      }
+      .sol-hd {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .sol-t {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .sol-badge {
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .b-solo {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .b-group {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .b-close {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .b-system {
+        background: #ede9fe;
+        color: #5b21b6;
+      }
+
+      .sol-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+        font-size: 13px;
+      }
+      .rtag {
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .r-init {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .r-part {
+        background: #e0e7ff;
+        color: #3730a3;
+      }
+      .amt {
+        font-weight: 600;
+        color: var(--primary);
+        margin-left: auto;
+      }
+      .sum-row {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px dashed var(--border);
+        font-size: 13px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .sum-val {
+        font-weight: 700;
+      }
+      .sum-exact {
+        color: var(--success);
+      }
+      .sum-diff {
+        color: var(--danger);
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        vertical-align: middle;
+        margin-right: 6px;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .pager {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .pager button {
+        padding: 5px 14px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 13px;
+        color: var(--text-sec);
+        transition: 0.15s;
+      }
+      .pager button:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .pager button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .pager .pg-info {
+        padding: 5px 10px;
+        font-size: 13px;
+        color: var(--text-sec);
+      }
+
+      .system-summary {
+        background: #f5f3ff;
+        border: 1px solid #ddd6fe;
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin-bottom: 14px;
+        font-size: 14px;
+        color: #5b21b6;
+      }
+      .system-summary strong {
+        font-size: 22px;
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 10px;
+        }
+        .ptable .col-nums {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>凑数计算器</h1>
+
+      <!-- 人员 -->
+      <div class="card">
+        <div class="card-title"><span class="icon">👥</span> 人员配置</div>
+        <div class="quick-btns">
+          <button class="qb" onclick="toggleAll('enabled',true)">
+            全部启用
+          </button>
+          <button class="qb" onclick="toggleAll('enabled',false)">
+            全部禁用
+          </button>
+          <button class="qb" onclick="toggleAll('initiator',true)">
+            全选发起人
+          </button>
+          <button class="qb" onclick="toggleAll('initiator',false)">
+            取消发起人
+          </button>
+          <button class="qb" onclick="toggleNums(true)">展开全部数字</button>
+          <button class="qb" onclick="toggleNums(false)">收起全部数字</button>
+        </div>
+        <table class="ptable">
+          <thead>
+            <tr>
+              <th style="width: 60px; text-align: center">启用</th>
+              <th style="width: 60px; text-align: center">发起人</th>
+              <th>姓名</th>
+              <th class="col-nums">名下数字</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in people %}
+            <tr>
+              <td>
+                <div class="cb-c">
+                  <input
+                    type="checkbox"
+                    class="cb-enabled"
+                    data-name="{{ p.name }}"
+                    checked
+                    onchange="onEnCh(this)"
+                  />
+                </div>
+              </td>
+              <td>
+                <div class="cb-c">
+                  <input
+                    type="checkbox"
+                    class="cb-initiator"
+                    data-name="{{ p.name }}"
+                  />
+                </div>
+              </td>
+              <td style="font-weight: 600">{{ p.name }}</td>
+              <td class="col-nums">
+                <button
+                  class="toggle-nums"
+                  onclick="toggleThisNums(this)"
+                  data-show="false"
+                >
+                  展开 ▼
+                </button>
+                <div class="nums-wrap collapsed" data-name="{{ p.name }}">
+                  <div class="nums-flex">
+                    {% for n in p.numbers %}
+                    <span class="nt">{{ n }}</span>
+                    {% endfor %}
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 目标金额 -->
+      <div class="card">
+        <div class="card-title"><span class="icon">🎯</span> 目标金额</div>
+        <div class="target-area">
+          <div class="ig">
+            <label for="targets-input">输入目标金额（多个用逗号分隔）</label>
+            <input
+              type="text"
+              id="targets-input"
+              placeholder="例如: 5241, 3000, 8888"
+            />
+          </div>
+          <button class="btn-calc" id="btn-calc" onclick="doCalc()">
+            开始计算
+          </button>
+          <button
+            class="btn-calc btn-system"
+            id="btn-system"
+            onclick="doSystem()"
+          >
+            系统解算
+          </button>
+        </div>
+      </div>
+
+      <div id="results-area"></div>
+    </div>
+
+    <script>
+      /* ── 折叠数字 ── */
+      function toggleThisNums(btn) {
+        const wrap = btn.nextElementSibling;
+        const show = btn.dataset.show === "true";
+        if (show) {
+          wrap.classList.add("collapsed");
+          btn.textContent = "展开 ▼";
+          btn.dataset.show = "false";
+        } else {
+          wrap.classList.remove("collapsed");
+          btn.textContent = "收起 ▲";
+          btn.dataset.show = "true";
+        }
+      }
+
+      function toggleNums(expand) {
+        document.querySelectorAll(".toggle-nums").forEach((btn) => {
+          const wrap = btn.nextElementSibling;
+          if (expand) {
+            wrap.classList.remove("collapsed");
+            btn.textContent = "收起 ▲";
+            btn.dataset.show = "true";
+          } else {
+            wrap.classList.add("collapsed");
+            btn.textContent = "展开 ▼";
+            btn.dataset.show = "false";
+          }
+        });
+      }
+
+      /* ── 勾选 ── */
+      function toggleAll(type, checked) {
+        const cls = type === "enabled" ? ".cb-enabled" : ".cb-initiator";
+        document.querySelectorAll(cls).forEach((cb) => {
+          if (type === "initiator" && checked) {
+            const en = document.querySelector(
+              `.cb-enabled[data-name="${cb.dataset.name}"]`
+            );
+            cb.checked = en && en.checked;
+          } else {
+            cb.checked = checked;
+          }
+        });
+        if (type === "enabled" && !checked) {
+          document
+            .querySelectorAll(".cb-initiator")
+            .forEach((cb) => (cb.checked = false));
+        }
+      }
+
+      function onEnCh(cb) {
+        if (!cb.checked) {
+          const ic = document.querySelector(
+            `.cb-initiator[data-name="${cb.dataset.name}"]`
+          );
+          if (ic) ic.checked = false;
+        }
+      }
+
+      /* ── 收集勾选状态 ── */
+      function getSelections() {
+        const raw = document.getElementById("targets-input").value;
+        if (!raw.trim()) {
+          alert("请输入目标金额");
+          return null;
+        }
+        const targets = raw
+          .split(/[,，\s]+/)
+          .filter(Boolean)
+          .map(Number);
+        if (targets.some(isNaN)) {
+          alert("金额格式不正确");
+          return null;
+        }
+
+        const enabled = [],
+          initiators = [];
+        document
+          .querySelectorAll(".cb-enabled:checked")
+          .forEach((cb) => enabled.push(cb.dataset.name));
+        document
+          .querySelectorAll(".cb-initiator:checked")
+          .forEach((cb) => initiators.push(cb.dataset.name));
+        if (!enabled.length) {
+          alert("请至少启用一个人");
+          return null;
+        }
+
+        return { targets, enabled, initiators };
+      }
+
+      /* ── 普通计算 ── */
+      async function doCalc() {
+        const sel = getSelections();
+        if (!sel) return;
+
+        const btn = document.getElementById("btn-calc");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>计算中…';
+
+        try {
+          const resp = await fetch("/calculate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(sel),
+          });
+          const data = await resp.json();
+          renderResults(data);
+        } catch (e) {
+          alert("请求失败: " + e.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "开始计算";
+        }
+      }
+
+      /* ── 普通结果渲染 ── */
+      const PAGE_SIZE = 10;
+      let pageState = {};
+
+      function renderResults(data) {
+        pageState = {};
+        const area = document.getElementById("results-area");
+        if (!Object.keys(data).length) {
+          area.innerHTML =
+            '<div class="card" style="color:var(--text-sec);font-style:italic">无结果</div>';
+          return;
+        }
+
+        let html = "";
+        for (const [target, info] of Object.entries(data)) {
+          const exact = info.exact || [];
+          const closest = info.closest || [];
+          const hasExact = exact.length > 0;
+          const key = "t" + target;
+          pageState[key] = { page: 0, exact, closest };
+
+          html += `<div class="target-block" id="block-${key}">`;
+          html += `<div class="target-hd">`;
+          html += `<span>目标金额：${Number(target).toLocaleString()}</span>`;
+          html += `<span class="count-badge">${
+            hasExact ? "精确匹配 " + exact.length + " 个方案" : "无精确匹配"
+          }</span>`;
+          html += `</div>`;
+          html += `<div class="target-bd" id="bd-${key}">`;
+
+          if (!hasExact) {
+            html += `<div class="no-exact">无法精确凑出此金额，以下是最接近的方案：</div>`;
+            if (closest.length) {
+              const diff = closest[0].diff;
+              const actual = closest[0].actual_sum;
+              html += `<div class="closest-label">⚠ 最接近金额：${actual.toLocaleString()}（差 ${diff.toLocaleString()}）共 ${
+                closest.length
+              } 个方案</div>`;
+            }
+          }
+
+          html += `<div id="sols-${key}"></div>`;
+          html += `<div class="pager" id="pager-${key}"></div>`;
+          html += `</div></div>`;
+        }
+        area.innerHTML = html;
+
+        for (const key in pageState) renderPage(key, 0);
+      }
+
+      function renderPage(key, page) {
+        const st = pageState[key];
+        const list = st.exact.length ? st.exact : st.closest;
+        const isClosest = !st.exact.length;
+        const total = list.length;
+        const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+
+        page = Math.max(0, Math.min(page, totalPages - 1));
+        st.page = page;
+        const start = page * PAGE_SIZE;
+        const slice = list.slice(start, start + PAGE_SIZE);
+
+        const solsEl = document.getElementById("sols-" + key);
+        const pagerEl = document.getElementById("pager-" + key);
+
+        if (!total) {
+          solsEl.innerHTML =
+            '<p style="color:var(--text-sec);font-style:italic;padding:8px 0">未找到任何可行方案</p>';
+          pagerEl.innerHTML = "";
+          return;
+        }
+
+        let html = "";
+        slice.forEach((sol, idx) => {
+          const gi = start + idx + 1;
+          const isSolo = sol.participants.length === 0;
+          const isExact = sol.diff === 0;
+
+          html += `<div class="sol-card"><div class="sol-hd">`;
+          html += `<span class="sol-t">方案 ${gi}</span>`;
+          if (isClosest)
+            html += `<span class="sol-badge b-close">差 ${sol.diff.toLocaleString()}</span>`;
+          else if (isSolo)
+            html += `<span class="sol-badge b-solo">独立完成</span>`;
+          else
+            html += `<span class="sol-badge b-group">${sol.total_people} 人协作</span>`;
+          html += `</div>`;
+
+          html += `<div class="sol-row"><span class="rtag r-init">发起人</span><span>${
+            sol.initiator
+          }</span><span class="amt">${sol.initiator_amount.toLocaleString()}</span></div>`;
+          (sol.participants || []).forEach((p) => {
+            html += `<div class="sol-row"><span class="rtag r-part">参与者</span><span>${
+              p.name
+            }</span><span class="amt">${p.amount.toLocaleString()}</span></div>`;
+          });
+
+          html += `<div class="sum-row"><span>合计 ${sol.total_people} 人</span>`;
+          html += `<span class="sum-val ${
+            isExact ? "sum-exact" : "sum-diff"
+          }">= ${sol.actual_sum.toLocaleString()}${
+            !isExact ? "（差 " + sol.diff.toLocaleString() + "）" : ""
+          }</span>`;
+          html += `</div></div>`;
+        });
+        solsEl.innerHTML = html;
+
+        if (totalPages <= 1) {
+          pagerEl.innerHTML = "";
+          return;
+        }
+        pagerEl.innerHTML = `
+    <button onclick="renderPage('${key}',0)" ${
+          page === 0 ? "disabled" : ""
+        }>首页</button>
+    <button onclick="renderPage('${key}',${page - 1})" ${
+          page === 0 ? "disabled" : ""
+        }>上一页</button>
+    <span class="pg-info">${page + 1} / ${totalPages}</span>
+    <button onclick="renderPage('${key}',${page + 1})" ${
+          page >= totalPages - 1 ? "disabled" : ""
+        }>下一页</button>
+    <button onclick="renderPage('${key}',${totalPages - 1})" ${
+          page >= totalPages - 1 ? "disabled" : ""
+        }>末页</button>
+  `;
+      }
+
+      /* ── 系统解算 ── */
+      async function doSystem() {
+        const sel = getSelections();
+        if (!sel) return;
+
+        const btn = document.getElementById("btn-system");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>解算中…';
+
+        try {
+          const resp = await fetch("/system_solve", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(sel),
+          });
+          const data = await resp.json();
+          renderSystemResults(data);
+        } catch (e) {
+          alert("请求失败: " + e.message);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "系统解算";
+        }
+      }
+
+      function renderSystemResults(data) {
+        const area = document.getElementById("results-area");
+        if (!Object.keys(data).length) {
+          area.innerHTML =
+            '<div class="card" style="color:var(--text-sec);font-style:italic">无结果</div>';
+          return;
+        }
+
+        let html = "";
+        for (const [target, solutions] of Object.entries(data)) {
+          html += `<div class="target-block">`;
+          html += `<div class="target-hd system-hd">`;
+          html += `<span>系统解算 · 目标金额：${Number(
+            target
+          ).toLocaleString()}</span>`;
+          html += `<span class="count-badge">${
+            solutions.length
+              ? "最优解：凑出 " + solutions.length + " 单"
+              : "无可行方案"
+          }</span>`;
+          html += `</div>`;
+          html += `<div class="target-bd">`;
+
+          if (!solutions.length) {
+            html += `<p style="color:var(--text-sec);font-style:italic;padding:8px 0">在每人最多发起一次、参与一次的约束下，无法凑出此金额。</p>`;
+          } else {
+            // 统计参与人员
+            const allPeople = new Set();
+            solutions.forEach((sol) => {
+              allPeople.add(sol.initiator);
+              (sol.participants || []).forEach((p) => allPeople.add(p.name));
+            });
+
+            html += `<div class="system-summary">
+        在每人最多发起一次、参与一次的约束下，最多可凑出 <strong>${solutions.length}</strong> 单，
+        共涉及 <strong>${allPeople.size}</strong> 人
+      </div>`;
+
+            solutions.forEach((sol, idx) => {
+              const isSolo = sol.participants.length === 0;
+              html += `<div class="sol-card"><div class="sol-hd">`;
+              html += `<span class="sol-t">第 ${idx + 1} 单</span>`;
+              html += `<span class="sol-badge ${
+                isSolo ? "b-solo" : "b-system"
+              }">${isSolo ? "独立完成" : sol.total_people + " 人协作"}</span>`;
+              html += `</div>`;
+
+              html += `<div class="sol-row"><span class="rtag r-init">发起人</span><span>${
+                sol.initiator
+              }</span><span class="amt">${sol.initiator_amount.toLocaleString()}</span></div>`;
+              (sol.participants || []).forEach((p) => {
+                html += `<div class="sol-row"><span class="rtag r-part">参与者</span><span>${
+                  p.name
+                }</span><span class="amt">${p.amount.toLocaleString()}</span></div>`;
+              });
+
+              html += `<div class="sum-row"><span>合计 ${sol.total_people} 人</span>`;
+              html += `<span class="sum-val sum-exact">= ${sol.actual_sum.toLocaleString()}</span>`;
+              html += `</div></div>`;
+            });
+          }
+
+          html += `</div></div>`;
+        }
+
+        area.innerHTML = html;
+      }
+    </script>
+  </body>
+</html>
