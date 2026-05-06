@@ -64,4 +64,4 @@ python app.py
 
 ## 致谢
 
-感谢 [小米 Mimo](https://mimo.chat/) 提供的 Token 额度支持。
+感谢 [小米 Mimo](https://100t.xiaomimimo.com/) 提供的 Token 额度支持。
